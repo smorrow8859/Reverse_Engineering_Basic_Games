@@ -1,0 +1,99 @@
+V=53248 - Sprite Register
+
+V+27 = Sprite Enable Register
+V+39 = Sprite 0 Color Register
+V+23 = Sprite Vertical Expansion Register
+V+29 = Sprite Horizontal Expansion Register
+V+1  = Sprite 0 Vertical Position
+
+2040 = Sprite 0 Shape Data Pointer
+V+21 = Sprite Enable Register
+V+34 = Background Color 1
+V+36 = Background Color 3
+
+680 - Memory location (line 840) - Unknown
+
+
+Cyan - Entrance
+Black - Bottom of Maze
+
+B=49152:E=53151:S=1024:X=10:Y=5
+JY=56321:SO=54272
+
+Characters:
+==================================
+Skull #,   35
+Wizard $,  36
+Bat %,     37
+Spirit &,  38
+Snake '    39
+Key   (    40
+Gold  )    41
+Outer wall 42
+Wall  +    43
+
+220-230 Sound Setup
+250 Joystick Routine
+280 SYS828,MX,MY (Monster positions?)
+360 Wall Barriers, MSB V+16
+380 Monster Movement
+390 D=D+1+(D=2)*3
+440 Death - End of Game -
+  (Change to Wait until player is bit several times BI=BI+1)
+
+510 Gold Value
+520 Key Score
+540 Level increase. If Level=10 Then Game starts over
+560 Level message
+580 Extra Bonus points (Gold)												
+590 Reset Monster positions
+630 Dungeon Generator, V+33 - Screen background
+670 Randomize Maze - change color of dungeon (based on L -level)
+830 Redefined Characters (Start) - 
+
+line 870
+	FORX=0TO7:READD:POKE14336+A*8+X,D
+
+840 Initialization 
+	680 - Unknown
+	144336 - Character Set
+	X(A),Y(A) - Unknown
+	828-914 > Draw fast Maze
+	960 (15*64) - Unknown
+	DL(A) - Unknown
+	M(A) - Unknown
+	916-951 - Unknown
+
+870 14336- Address
+880 Machine Language Scroll Routine (828-914)
+900 828-914 - ML
+910 916-951 - M(X)
+
+
+Total GOSUBs
+60 GOSUB 840 - Initializing Data
+190 GOSUB 640
+310 GOSUB510,520,530
+440 GOSUB610:GOSUB 620
+510 GOSUB610:GOSUB 620 - Gold
+520 GOSUB610:GOSUB 620 - Key
+530 GOSUB610:GOSUB 620
+590 GOSUB640 - Reset monster positions, player positions, sprite position (light)
+
+New gosub - 925
+
+680 POKE 49152+x,42+64*3 - 234 - bottom of maze
+
+
+Old lines (before change)
+
+210 POKE2040,15:POKEV+21,1:POKEV+34,1:POKEV+36,11
+
+1010 DATA040,000,000,255,129,255,153,129,255 (Gold)
+1040 DATA043,249,249,000,159,159,000,249,249 (Wall)
+
+Multicolor
+53283 V+35 - Wall color
+53284 V+36 - Side Wall((
+
+
