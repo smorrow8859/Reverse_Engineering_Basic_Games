@@ -1,0 +1,199 @@
+
+
+10 rem ********************************
+20 rem *       CATACOMBS v1.0         *
+30 rem *     by cleve blakemore       *
+40 rem ********************************
+50 poke53281,.:poke53280,.:print"S......
+"tab(14)chr$(8)chr$(142)".. catacombs "
+60 printtab(6)"....W please wait...loadi
+ng data! ":gosub840
+70 poke53272,30:poke53265,peek(53265)or6
+4
+80 print".............."tab(15)"skull  #
+.":printtab(15)"wizard $."
+90 printtab(15)"bat    %.":printtab(15)"
+spirit &.":printtab(15)"snake  '."
+100 b=49152:e=53151:v=53248:s=1024:x=10:
+y=5:mx=.:my=.:r=80:sr=40:m=32
+110 l=.:ex=239:jy=56321:so=54272:def fna
+(b)=y*sr+x+s:def fnb(b)=peek(ty*sr+tx+s)
+
+120 def fnx(b)=(x-3)*8+28+((x>31)*255):d
+effne(b)=(x>31)*-1:deffny(x)=y*8+35
+
+130 def fnj(x)=15-(peek(jy)and15):def fn
+c(x)=b+mx+tx+((my+ty)*r)
+140 def fncx(b)=cx(d)+(cx(d)<mx+x)*-1+(c
+x(d)>mx+x)*1
+150 def fncy(b)=cy(d)+(cy(d)<my+y)*-1+(c
+y(d)>my+y)*1
+160 def fnk(q)=peek(fnc(.))=m(l)
+170 deffnch(b)=(fnb(.)=m+8)*-1+(fnb(.)=m
++9)*-2+(fnb(.)=m+13)*-3
+180 deffnet(b)=tx<1ortx>38orty<2orty>23
+190 def fnm(x)=(b+cx(d)+(cy(d)*r)):def f
+nw(x)=peek(fnm(.))<>m:gosub640
+200 pokev+27,1:pokev+39,7:pokev+23,1:pok
+ev+29,1:pokev,fnx(.):pokev+1,fny(.)
+210 poke2040,15:pokev+21,1:pokev+34,1:po
+kev+36,11
+220 ford=sotoso+24:poked,.:next:pokeso,2
+55:pokeso+1,27:pokes0+5,64
+230 pokeso+6,128:pokeso+24,10
+240 d=.:goto280
+250 rem joystick routine
+260 tx=mx+x(j):ty=my+y(j):iftx<0ortx>41o
+rty<0orty>25then280
+270 pokeso+4,33:mx=tx:my=ty
+280 sys828,mx,my:pokefna(.),.
+290 pokeso+4,.:j=fnj(.):tx=x+x(j):ty=y+y
+(j):iffnk(.)then440
+300 iffnb(.)=mthen340
+310 onfnch(.)gosub510,520,530
+320 iffnb(.)=exandkthen540
+330 goto390
+340 iffnet(.)then260
+350 pokeso+4,129:ifx<>txory<>tythenpokef
+na(.),m
+360 x=tx:y=ty:pokefna(.),.:pokev+16,fne(
+.):pokev,fnx(.):pokev+1,fny(.)
+370 pokeso+4,.
+380 rem monster movement
+390 d=d+1+(d=2)*3
+400 pokefnm(.),m:tx=cx(d):ty=cy(d):cx(d)
+=fncx(.):iffnw(.)thencx(d)=tx
+410 cy(d)=fncy(.):iffnw(.)thency(d)=ty
+420 pokefnm(.),m(l)
+430 goto280
+440 gosub610:print"..]chomp";:gosub620
+450 pokev+21,.:pokev+33,.
+460 print"S"tab(13)".... gold = ";g:prin
+t"............ another game ?{y or n}"
+470 poke198,.
+480 geta$:ifa$=""then480
+490 ifa$="n"thenpoke679,.:sys679
+500 pokev+24,21:pokev+17,peek(v+17)and19
+1:run
+510 gosub610:print".g 50":g=g+50:gosub62
+0:return
+520 gosub610:print". key ":k=1:g=g+100:g
+osub620:return
+530 gosub610:pokev+33,2:gosub620:pokev+3
+3,.:g=g-(g>49)*-50:return
+540 pokev+21,.:l=l+1:ifl=10then450
+550 k=.:print"S......"tab(4)". prepare f
+or the next level !! "
+560 print"..."tab(4)".  descending down
+56 level";l+1;"]   ."
+to level";l+1;"]   ."
+570 pokeso+4,17:ford=100to.step-1::forx=
+.to50:next:pokeso+1,d:next:pokeso+1,27
+580 pokeso+4,.:g=g+25:printtab(14)".  go
+ld = ";g;
+590 gosub640:mx=.:my=.:x=10:y=5:d=.:poke
+v,fnx(.):pokev+1,fny(.)
+600 pokev+16,fne(.):pokev+21,1:goto280
+610 pokefnc(.),m:pokev+21,.:poke781,y:po
+ke782,x-1:poke783,.:sys65520:return
+620 pokeso+4,17:forq=.to500:next:pokev+2
+1,1:pokeso+4,.:return
+630 rem dunjon generator
+640 sys916:pokev+33,(l<5)*-15:forq=192to
+204step4:poke648,q:print"PS":ford=1to3
+650 forx=.to7:if(2~xandl(l))thenprint".+
+++++++++++R             ";spc(40);
+660 print"  .+++R        .+++R";
+670 next:next:next:poke648,4:poke53283,l
++2:fora=btob+r:pokea,42+64*3:next
+680 fora=e-rtoe+1:pokea,42+64*3:next:for
+a=btoestepr:pokea,42+64*3:next
+690 pokeb+3+r*3,47+64
+700 a=rnd(1)*60+8:q=rnd(1)*40+5:ifpeek(b
++a+q*r)<>mthen700
+710 pokeb+q*r+a,ex
+720 ford=1tol*2
+730 a=rnd(1)*70+5:q=rnd(1)*40+5:ifpeek(b
++q*r+a)<>mthen730
+740 pokeb+q*r+a,m+8:next
+750 ford=1tol*2
+760 a=rnd(1)*70+5:q=rnd(1)*40+5:ifpeek(b
++q*r+a)<>mthen760
+770 pokeb+q*r+a,m+13:next
+780 a=rnd(1)*70+5:q=rnd(1)*40+5:ifpeek(b
++q*r+a)<>mthen780
+790 pokeb+q*r+a,m+9
+800 ford=.to2
+810 a=rnd(1)*70+5:q=rnd(1)*40+5:ifpeek(b
++q*r+a)<>mthen810
+820 cx(d)=int(a):cy(d)=int(q):next:retur
+820 cx(d)=int(
+n
+830 rem redefined characters
+840 forx=1to33:reada:poke680+x,a:next:po
+8406334,peek(56334)and254
+ke56334,peek(56334)and254
+850 poke1,peek(1)and251:sys681:poke1,pee
+k(1)or4:poke56334,peek(56334)or1
+860 reada:ifa=-1then890
+870 forx=.to7:readd:poke14336+a*8+x,d:ne
+xt:goto860
+880 rem ml scroll routine
+890 dimx(10),y(10),cx(2),cy(2),m(9),l(9)
+:fora=.to10:readx(a),y(a):next
+900 fora=828to914:readb:pokea,b:next:for
+a=.to63:poke15*64+a,255:next
+910 fora=.to9:readl(a):next:fora=.to9:re
+adm(a):next:forx=916to951:reada:pokex,a
+920 next:return
+930 data 169,,133,251,133,253,169,208,13
+3,252,169,56,133,254,162,8
+940 data 160,,177,251,145,253,136,208,24
+9,230,252,230,254,202,208,240,96
+950 data000,152,152,190,217,024,060,036,
+195
+960 data035,126,153,153,153,126,066,090,
+126
+970 data036,024,126,024,126,153,060,126,
+126
+980 data037,000,036,126,219,129,066,000,
+000
+990 data038,031,021,021,014,028,156,248,
+112
+1000 data039,060,066,002,028,032,024,004
+,008
+1010 data040,000,000,255,129,255,153,129
+,255
+,255                                ,008
+1020 data041,062,034,062,008,008,056,008
+,056
+1030 data042,255,129,189,165,165,189,129
+,255
+1040 data043,249,249,000,159,159,000,249
+,249
+1050 data045,000,000,000,000,016,000,000
+,000
+1060 data047,129,066,036,024,024,036,066
+,129,-1
+1070 data0,0,0,-1,0,1,0,0,-1,0,-1,-1,-1,
+1,0,0,1,0,1,-1,1,1
+1080 data 32,155,183,138,24,105,0,133,4,
+169,192,105,0,133,5,32,155,183,224
+1090 data 0,240,16,165,4,24,105,80,133,4
+,165,5,105,0,133,5,202,208,240
+,100 data 169,0,133,2,169,4,133,3,162,24
+1100 data 169,0,133,2,169,4,133,3,162,24
+,160,39,177,4,145,2,136,16,249
+1110 data 165,2,24,105,40,133,2,165,3,10
+5,0,133,3,165,4,24,105,80,133
+1120 data 4,165,5,105,0,133,5,202,16,218
+,96
+1130 data 201,223,178,245,251,199,143,12
+4,211,255
+1140 data 35,36,37,38,39,35,36,37,38,39
+1150 data 169,0,133,251,169,192,133,252,
+162,20,160,0,169,32,145,251,200
+1160 data 192,201,208,247,24,169,200,101
+,251,133,251,144,2,230,252,202
+1170 data 208,231,96
+
