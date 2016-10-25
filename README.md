@@ -4,4 +4,6 @@ If you have trouble loading the game (typing in the special characters). Use the
 
 LOAD "(shift c)ATACOMBS",8,1
 
+The raster.d64 - contains the version for the code I modified. The 
+
 Ask if you have any questions. :)
