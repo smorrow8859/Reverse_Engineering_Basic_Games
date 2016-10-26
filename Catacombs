@@ -126,9 +126,7 @@ a=btoestepr:pokea,42+64*3:next
 800 ford=.to2
 810 a=rnd(1)*70+5:q=rnd(1)*40+5:ifpeek(b
 +q*r+a)<>mthen810
-820 cx(d)=int(a):cy(d)=int(q):next:retur
-820 cx(d)=int(
-n
+820 cx(d)=int(a):cy(d)=int(q):next:return
 830 rem redefined characters
 840 forx=1to33:reada:poke680+x,a:next:po
 8406334,peek(56334)and254
