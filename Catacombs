@@ -130,7 +130,6 @@ a=btoestepr:pokea,42+64*3:next
 
 830 rem redefined characters
 840 forx=1to33:reada:poke680+x,a:next:po
-8406334,peek(56334)and254
 ke56334,peek(56334)and254
 850 poke1,peek(1)and251:sys681:poke1,pee
 k(1)or4:poke56334,peek(56334)or1
