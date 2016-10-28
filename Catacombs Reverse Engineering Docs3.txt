@@ -1,0 +1,487 @@
+Shift backspace - Insert
+
+V=53248 - Sprite Register
+
+V+21 = Sprite Enable Register
+V+27 = Sprite to Foreground Display Priority Register
+V+39 = Sprite 0 Color Register
+V+23 = Sprite Vertical Expansion Register
+V+29 = Sprite Horizontal Expansion Register
+V+1  = Sprite 0 Vertical Position
+
+2040 = Sprite 0 Shape Data Pointer
+V+21 = Sprite Enable Register
+V+34 = Background Color 1
+V+36 = Background Color 3
+
+680 - Memory location (line 840) - Unknown
+
+
+Cyan - Entrance
+Black - Bottom of Maze
+
+B=49152 - Start of map
+E=53151:S=1024:X=10:Y=5
+MX=0:MY=0 - Map (x), Map (y)
+
+R=80:SR=40:M=32:L=0:EX=239
+JY=56321:SO=54272
+
+SR
+TX, TY - Joystick routine
+
+Characters:
+==================================
+Skull #,   35
+Wizard $,  36
+Bat %,     37
+Spirit &,  38
+Snake '    39
+Key   ( list    40
+Gold  )    41
+Outer wall 42
+Wall  +    43
+Turns off lights      -    45
+
+110
+	A(B)=5*40+10+1024 = 1234
+	DEF FNB(B)=PEEK(TY*SR+TX+S)
+120 
+	X(A) - Character horizontal positioning
+	Y(A) - Character vertical positioning
+	E(B) - Joystick setup
+	J(X)                
+
+120 	DEF FNX(B)=(X-3)*8+28+((X.31)*255):DEFFNE(B)=(X>31)*-	1:DEFFNY(X)=Y*8+35 - Position sprite on character x,y
+
+130
+list
+
+
+	Joystick routine
+	DEF FNJ(X)=15-(PEEK(JY)AND15):DEF FNC(X)=B+MX+TX+((MY	+TY)*R)
+	C(X)=B+MX+TX+((MY+TY)*R)
+	C(X)=49152+0+TX+((0+TY)*80)
+140
+	CX(B) - MX (Monster Map X)
+150LIST 
+	CY(B) - MY (Monster Map Y)
+160	
+	Enemy position to player
+	DEF FNK(Q)=PEEK(FNC(.)=M(L)
+	ML(L)
+170	
+	CH(B) - M variable
+180
+	ET(B) - TX,TY (Boundaries)
+190
+	M(X) - (B+CX(D)+(CY(D)*R))
+
+	M(X) - (49152+CX(D)+(CY(D)*80))
+
+	M(0)=35,M(1)=36,M(2)=37,M(3)=38,M(4)=39
+	M(5)=35,M(6)=36,M(7)=37,M(8)=38,M(9)=39
+
+	DEF FNW(X)=PEEK(FNM(.))<>M
+
+
+Sprite Setup
+200 POKEV+27,1  - Sprite to Foreground Display Priority Register
+    POKEV+39,7  - Sprite 0 Color Register 
+    POKEV+23,1  - Sprite Vertical Expansion Register
+    POKEV+29,1  - Sprite Horizontal Expansion Register
+    POKEV,FNX(.):POKEV+1,FNY(.)
+210 POKE2040,192
+    POKEV+21,1  - Sprite Enable Register
+    POKEV+34,1  - Background Color 1
+    POKEV+36,11 - Background Color 3
+
+220-230 Sound Setup
+230 POKESO+6,128:POKESO+24,10
+
+250 Joystick Routine
+*********************************************
+260 TX=MX+X(J):TY=MY+Y(J) - Joystick movement
+280 SYS828,MX,MY - Map Position X,Y
+============================================================
+290 IF FN K(.) THEN 440 - check for monster/player collision
+300
+	IF FN B(.)=M THEN 340 
+310
+	IF FN CH(.) THEN 510 - Gold found
+			 520 - Key found
+			 530 - Gold value is decreased
+320 IF FN B(.)=EX AND K THEN 540 - Player escaped the maze
+
+	EX - Exit, K= Key
+
+340 IF FN ET(.) THEN 260
+
+350 POKESO+4,129:IFX<>TXORY<>TYTHENPOKEFNA(.),M
+
+
+360 Wall Barriers (X=TX:Y=TY)
+	X=TX:Y=TY:POKEFNA(.),.
+	POKEV+16,FNE(.)
+	POKEV,FNX(.)
+	POKEV+1,FNY(.)
+
+
+380 Monster Movement
+*********************************************
+390 D=D+1+(D=2)*3 - Determines how many monsters appear on the screen
+
+400 POKE FN M(.),M:TX=CX(D):TY=CY(D):CX(D)=FN CX(.):IF FN W(.) THEN CX(D)=TX
+410 CY(D)=FN CY(.):IF FN W(.) THEN CY(D)=TY
+420 POKE FN M(.),M(L)
+440 Death - End of Game -
+*********************************************
+  (Change to Wait until player is bit several times BI=BI+1)
+500 POKEV+24,21 - Turn on default character set
+POKEV+17,PEEK(V+17)AND191 - Turns off extended color mode
+list 
+510 Gold Value 
+520 Key Score
+530 POKEV+33,2 - Background Color 0
+    POKEV+33,.
+    G=G-(G>49)*-50
+
+540 Level increase. If Level=10 Then Game starts over
+560 Level message
+580 Extra Bonus points (Gold)												
+590 Reset Monster positions, sprite position reset
+	POKEV,FNX(.)
+	POKEV+1,FNY(.)
+
+*********************************************
+600 Set sprite MSB V+16 
+	Enable sprite (after advancing level)
+610 POKE FN C(.),M
+	 POKEV+21,1 - position
+	 POKE781,Y:POKE782,X-1:POKE783,.:SYS65520
+620 Sound 
+	 POKEV+21,1 - Enable sprite
+
+
+
+630 Dungeon Generator, V+33 - Screen background
+*********************************************
+640 SYS916:POKEV+33,(L<5)*-15
+
+	V+33 - Background Color 0
+	FORQ=192TO204STEP4:POKE648,Q:FORD=1TO3
+
+
+650 FORX=0TO7:IF(2^X AND L(L)) THEN PRINT "+++++++++++     SPC(40)"
+	L(0)=201,L(1)=223,L(2)=178,L(3)=245,L(4)=251
+	L(5)=199,L(6)=143,L(7)=124,L(8)=211,L(9)=255
+	
+
+660 PRINT "    +++         ++++";
+670 NEXT:NEXT:NEXT:POKE648,4:POKE53283,L+2:FORA=BTOB+R:POKEA,42+64*3:NEXT	
+
+670 Randomize Maze - change color of dungeon (based on L -level)
+
+
+680 POKE 49152+x,42+64*3 - 234 - bottom of maze
+
+700 Randomly position the Door - EX
+730 Randomly position the Gold - M+8
+760 Randomly position the -    - M+13 
+780 Randomly position the key  - M+9
+810 Randomly position the enemy
+list 
+830 Redefined Characters (Start) - 
+*********************************************
+
+line 870
+	FORX=0TO7:READD:POKE14336+A*8+X,D
+
+840 Initialization - Redefine character set
+	680 - Unknown
+
+	LDA #0
+	STA 251
+	STA 253
+	LDA #208
+	STA 252		;53248
+	LDA #56		;53304
+	STA 254
+
+
+	LDX #8
+02B9	LDY #0LIST
+02BB	LDA (251),Y
+	STA (253),Y
+	DEY
+	BNE 02BB
+	INC 252
+	INC 254
+	DEX
+	BNE $02B9
+
+	144336 - Character Set
+	X(A),Y(A) - Unknown
+	828-914 > Draw fast Maze
+	960 (15*64) - Unknown
+	DL(A) - Unknown
+	M(A) - Unknown
+	916-951 - Unknown
+
+870 14336- Address
+880 Machine Language Scroll Routine (828-914)
+*********************************************
+890 DIMX(10),Y(10),CX(2),CY(2),M(9),L(9)
+
+FORA=.TO10:READX(A),Y(A):NEXT
+
+X(A),Y(A) - Ranges from 0-10
+
+X(0)=0,  Y(0)=0
+X(1)=0,  Y(1)=-1
+X(2)=0,  Y(2)=1
+X(3)=0,  Y(3)=0
+X(4)=-1, Y(4)=0
+X(5)=-1, Y(5)-1
+X(6)=-1, Y(6)=1
+X(7)=0,  X(7)=0
+X(8)=1,  Y(8)=0
+X(9)=1,  Y(9)=-1
+X(10)=1, Y(10)=1
+
+Starts at 1070
+
+
+READ (0-10) - A=X(A),Y(A)
+READ (0-9)  - DL(A),M(A)
+
+
+
+900 828-914 - ML
+	Code Sample Diassembly:
+*= 828
+
+SYS 828, 1, 1
+
+	JSR $B79B	;47003 - Get parameter 1
+	TXA
+	CLC
+	ADC #0
+	STA 4		;828,(MapX),y: POKE 4,X
+	LDA #192
+	ADC #0
+	STA 5		
+	JSR $B79B	;47003 - Get parameter 2
+	CPX #0
+	BEQ $0362
+sys
+$0352	LDA 4		;Get X
+	CLC
+	ADC #80
+	STA 4		;828,x,(MapY): POKE 4,Y
+	LDA 5
+	ADC #0
+	STA 5
+	DEX
+	BNE $0352
+
+$0362	LDA #0
+	STA 2
+	LDA #4		;1024 - Screen memory
+	STA 3
+	LDX #24		;How far to draw the map down the screen
+$036C	LDY #39		;How far to draw the map (left/right)
+$036E	LDA (4),Y	;MapY
+	STA (2),Y
+	DEY
+	BPL $036E
+
+	LDA 2		;low byte of Screen Memory
+	CLC
+	ADC #40
+	STA 2
+	LDA 3		;high byte of Screen Memory
+	ADC #0
+	STA 3
+	LDA 4
+	CLC
+	ADC #80
+	STA 4		;MapX
+	LDA 5
+	ADC #0
+	STA 5		;MapY
+	DEX
+	BPL $036C
+	RTS
+	BRK
+* = 916
+(line 1150 - DATA)
+	LDA #0
+	STA 251
+	LDA #192	;49152
+	STA 252
+	LDX #20 	;
+$039E	LDY #0
+$03A0	LDA #32
+	STA (251),Y
+	INY
+	CPY #201
+	BNE $03A0
+	CLC
+	LDA #200
+	ADC 251
+	STA 251
+	BCC $03B4
+	INC 252
+$03B4	DEX
+	BNE $039E
+	RTS
+
+	FORA=.TO63:POKE15*64+A,255:NEXT 
+	960 - 15*64
+
+
+910 916-951 - M(X)
+
+	FORA=.TO9:READDL(A):NEXT
+	FORA=.TO9:READM(A):NEXT
+	FORX=916TO951:READA:POKEX,A:NEXT
+
+
+
+Total GOSUBs
+60 GOSUB 840 - Initializing Data
+*********************************************
+190 GOSUB 640
+310 GOSUB510,520,530
+440 GOSUB610:GOSUB 620
+510 GOSUB610:GOSUB 620 - Gold
+520 GOSUB610:GOSUB 620 - Key
+530 GOSUB610:GOSUB 620
+590 GOSUB640 - Reset monster positions, player positions, sprite position (light)
+
+New gosub - 925
+
+Old lines (before change)
+
+70 POKE 53272,30:POKE 53265,PEEK(53265)OR64
+210 POKE2040,15:POKEV+21,1:POKEV+34,1:POKEV+36,11
+
+290 POKESO+4,.:J=FNJ(.):TX=X+X(J):TY=Y+Y(J):IFFNK(.)THEN440
+
+1010 DATA040,000,000,255,129,255,153,129,255 (Gold)
+1040 DATA043,249,249,000,159,159,000,249,249 (Wall)
+
+Multicolor
+53283 V+35 - Wall color
+53284 V+36 - Side Wall((
+
+
+Newly Added (Edited)
+
+120 DEF FNX(B)=(X-3)*8+28+((X.31)*255):DEFFNE(B)=(X>31)*-1:DEFFNY(X)=Y*8+35
+140 DEF FNCX(B)=CX(D)+(CX(D)<MX+X)*-1+(CX(D))>MX+X)*1
+170 DEF FNCH(B)=(FNB(.)=M+8)*-1+(FNB(.)=M+9)*2+(FNB(.)=M+13)*-3
+
+635 SYS916
+650
+672 GOTO690 (DELETE)
+
+676 GOTO690
+
+180
+
+
+910
+
+Reads occur as:
+Line 840
+Redefined Characters up to -1
+
+	FORX=1TO33:READA:POKE680+X,A:NEXT (930-940)
+	READ A:IF A=-1 THEN 890 (950-1065)
+	FORX=0TO7:READD:POKE14336+A*8+X,D:NEXT	
+890
+	FORA=0TO10:READX(A),Y(A):NEXT (1070)
+900
+	FORA=828TO914:READB:POKEA,B:NEXT (1080-1120)
+905
+	FORA=0TO63:POKE15*64+A,255:NEXT 
+910
+	FORA=0TO9:READ L(A):NEXT (1130)
+	FORA=0TO9:READ M(A):NEXT (1140)
+	FORX=916TO951:READA:POKEX,A:NEXT (1150-1170)
+925
+	FORX=12288TO12288+62:READVL:POKEX,VL:NEXT
+
+Functions Defined
+110 FN A(0)=Y*40+X+S,, FN A(0)=1363
+    FN B(0)=PEEK(TY*SR+TX+S), FN B(0)=25
+120 FN X(0)=(X-3)*8+28+((X>31)*255)
+	X(0)=156 -checking X position
+    FN E(0)=(X>31)*-1
+    FN Y(0)=Y*8+35
+	Y(0)=99
+130 FN J(0)=15-(PEEK(JY)AND15)
+	J(0)=0
+    FN C(0)=49152+MX+TX+((MY+TY)*80)
+	C(0)=49811 - Description: B+MX+TX+((MY+TY)*80)
+140 FN CX(0)=CX(D)+(CX(D)<MX+X)*-1+(CX(D)>MX+X)*1
+	CX(0)=52
+150 FN CY(0)=CY(D)+(CY(D)<MY+Y)*-1+(CY(D)>MX+X)*1
+	CY(0)=34
+160 FN K(0)=PEEK(FNC C(.))=M(L)
+	K(0)=0
+170 FN CH(0)=(FN B(.)=M+8)*-1+(FN B(.)=M+9)*-2+(FN B(.)=M+13)*-3
+	CH(0)=2
+180 FN ET(0)=TX<1 OR TX>38 OR TY<2 OR TY>23
+	ET(0)=0 - Screen Borders
+190 FN M(0)=(49152+CX(D)+(CY(D)*80))
+	M(0)=52005
+    FN W(0)=PEEK(FN M(.))<>M
+	W(0)=-1
+
+
+Variables Defined
+B=49152
+E=53151
+V=53248
+S=1024
+X=10
+Y=5
+MX=0
+MY=0
+R=80
+SR=40
+M=32
+L=0
+EX=239
+JY=56321
+SO=54272
+
+D=0
+TX=MX+X(J) - Map X boundaries
+TY=MY+Y(J) - Map Y boundaries
+J=FN J(0)
+TX=X+X(J) - Player X boundaries
+TY=Y+Y(J) - Player Y boundaries
+
+290
+
+CY=41 (Gold) - Level 3
+A(0)=1691 - Player position
+C(0)=54528
+CX(0)=57, CY(0)=41 - Monsters
+K(0)=0
+CH(0)=0
+ET(0)=-1
+M(0)=52488
+W(0)=0
+
+Things not understand (in code) yet
+How the monsters move throughout the map (after you scrolled
+ to another screen)
+How the monsters stop when they hit an object
+Monster to monster collision
+
+390
